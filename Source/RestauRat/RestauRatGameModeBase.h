@@ -14,4 +14,6 @@ class RESTAURAT_API ARestauRatGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+ARestauRatGameModeBase();
 };
