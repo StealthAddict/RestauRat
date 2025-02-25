@@ -5,7 +5,9 @@
 #include "Player/RatCharacter.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interactables/Grabbable.h"
 
+#include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
@@ -64,9 +66,9 @@ void ARatPlayerController::SetupInputComponent()
 
     EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ARatPlayerController::OnJumpPressed);
     EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ARatPlayerController::OnJumpEnded);
-    EnhancedInputComponent->BindAction(PopAction, ETriggerEvent::Triggered, this, &ARatPlayerController::OnPopPressed);
+    EnhancedInputComponent->BindAction(PopAction, ETriggerEvent::Started, this, &ARatPlayerController::OnPopPressed);
 
-    EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ARatPlayerController::OnInteractPressed);
+    EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ARatPlayerController::OnInteractPressed);
   }
 }
 
@@ -223,5 +225,18 @@ void ARatPlayerController::OnInteractPressed()
         // Check what object is currently infront and trigger its interact function.
 
         if (GEngine) {GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Interact Pressed"));}
+
+        if (Character->HeldObject)
+        {
+            Character->DropObject();
+        }
+        else if (Character->FocusedObject) 
+        {
+            
+            Character->FocusedObject->Interact(Character);
+            Character->HeldObject = Character->FocusedObject;
+            /** TODO: Test Physics Handle vs Physics Constraint */
+        }
     }
 }
+
