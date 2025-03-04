@@ -17,7 +17,6 @@ public:
 	AInteractable();
 
 	FORCEINLINE class USceneComponent* GetRootSceneComponent() const { return RootSceneComponent; }
-	FORCEINLINE class UBoxComponent* GetHitboxComponent() const { return HitboxComponent; }
 	FORCEINLINE class UStaticMeshComponent* GetMeshComponent() const { return MeshComponent; }
 	
 	virtual void Interact(ACharacter* Character);
@@ -31,8 +30,6 @@ protected:
 	// Add Blueprint accessible Components to define the Mesh and the Hit Box
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Interactable")
 	class USceneComponent* RootSceneComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Interactable")
-	class UBoxComponent* HitboxComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Interactable")
 	class UStaticMeshComponent* MeshComponent;
 

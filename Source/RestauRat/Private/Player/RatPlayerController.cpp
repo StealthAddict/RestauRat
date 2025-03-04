@@ -214,28 +214,21 @@ void ARatPlayerController::OnPopPressed()
 
 
 /**
- * TODO:
- * - all of it 
  */
 void ARatPlayerController::OnInteractPressed()
 {
     ARatCharacter* Character = Cast<ARatCharacter>(this->GetCharacter());
     if (Character && CanPerformAction(ECharacterActionStateEnum::INTERACT)) {
         UpdateActionState(ECharacterActionStateEnum::INTERACT);
-        // Check what object is currently infront and trigger its interact function.
 
-        if (GEngine) {GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Interact Pressed"));}
-
-        if (Character->HeldObject)
-        {
-            Character->DropObject();
-        }
+        if (Character->HeldObject) { Character->DropObject(); }
         else if (Character->FocusedObject) 
         {
-            
-            Character->FocusedObject->Interact(Character);
-            Character->HeldObject = Character->FocusedObject;
-            /** TODO: Test Physics Handle vs Physics Constraint */
+            if (AGrabbable* GrabbableObject = Cast<AGrabbable>(Character->FocusedObject))
+            {
+                Character->GrabObject();
+            } 
+            else { Character->FocusedObject->Interact(Character); }
         }
     }
 }

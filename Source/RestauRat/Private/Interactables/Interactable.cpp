@@ -18,14 +18,10 @@ AInteractable::AInteractable()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-
 	RootSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	RootSceneComponent->SetupAttachment(RootComponent);
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	MeshComponent->SetupAttachment(RootSceneComponent);
-	HitboxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Hitbox"));
-	HitboxComponent->SetupAttachment(MeshComponent);
-
 	MeshComponent->SetSimulatePhysics(true);
 
 	bIsFocused = false;
@@ -59,13 +55,4 @@ void AInteractable::Interact(ACharacter* Character)
 {
 	// Generic Interact
 	if (GEngine) {GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Orange, TEXT("Triggered Interactable Object"));}
-
-	
-	ARatCharacter* RatCharacter = Cast<ARatCharacter>(Character);
-	if (RatCharacter)
-	{
-		bIsFocused = false;
-		// MoveComponentTo(RootSceneComponent, , RootSceneComponent->GetRelativeRotation(), RatCharacter->GrabPoint->GetComponentLocation(), true);
-		RatCharacter->GrabObject(this, MeshComponent, "Mesh");
-	}
 }

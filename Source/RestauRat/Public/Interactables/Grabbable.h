@@ -3,47 +3,36 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Interactables/Interactable.h"
 #include "Grabbable.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class RESTAURAT_API AGrabbable : public AActor
+class RESTAURAT_API AGrabbable : public AInteractable
 {
 	GENERATED_BODY()
-	
-	/**
-	 * TODO:
-	 * 	- Change to be a child of Interactable
-	 */
 
-public:	
-	// Sets default values for this actor's properties
+public:
 	AGrabbable();
 
-	FORCEINLINE class USceneComponent* GetRootSceneComponent() const { return RootSceneComponent; }
-	FORCEINLINE class UBoxComponent* GetHitboxComponent() const { return HitboxComponent; }
-	FORCEINLINE class UStaticMeshComponent* GetMeshComponent() const { return MeshComponent; }
-	FORCEINLINE class UBoxComponent* GetInteractHitboxComponent() const { return InteractHitboxComponent; }
-	
-	virtual void Grab(ACharacter* GrabbingCharacter);
-	virtual void Drop();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cooking")
+	bool bIsCuttable;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cooking")
+	bool bIsIngredient;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cooking")
+	FString ItemName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cooking")
+	int32 NumCutPieces;
+
+	UFUNCTION()
+	void CutIngredient();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	// Set in BP
+	UPROPERTY(EditDefaultsOnly, Category = "Cooking")
+	TSubclassOf<AGrabbable> CutIngredientBlueprint;
 
-	// Add Blueprint accessible Components to define the Mesh and the Hit Box
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Interactable")
-	class USceneComponent* RootSceneComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Interactable")
-	class UBoxComponent* HitboxComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Interactable")
-	class UStaticMeshComponent* MeshComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Interactable")
-	class UBoxComponent* InteractHitboxComponent;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 };

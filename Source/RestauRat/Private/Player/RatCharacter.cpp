@@ -127,6 +127,7 @@ void ARatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 }
 
+/** Line trace follows player skeleton's forward vector, but moves on camera's Z axis. */
 FHitResult ARatCharacter::TriggerLineTrace()
 {
 	// Line trace
@@ -135,9 +136,12 @@ FHitResult ARatCharacter::TriggerLineTrace()
 	ActorsToIgnore.Add(this);
 
 	ETraceTypeQuery TraceChannel = UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility);
-	FVector EndOfTrace = GetActorLocation() + (GetActorForwardVector() * 250);
 
-	UKismetSystemLibrary::LineTraceSingle(GetWorld(), GetActorLocation(), EndOfTrace, // , 25.f
+	FVector ForwardVector = GetActorForwardVector();
+	ForwardVector.Z = CameraComponent->GetForwardVector().Z;
+	FVector EndOfTrace = GetActorLocation() + (ForwardVector * 250);
+
+	UKismetSystemLibrary::SphereTraceSingle(GetWorld(), GetActorLocation(), EndOfTrace, 25.f,
 		TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true, FColor::Red, FColor::Green);
 
 	return HitResult;
@@ -163,23 +167,32 @@ void ARatCharacter::DropObject()
 {
 	if (HeldObject)
 	{
-		if (GEngine) {GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Cyan, TEXT("Dropped!"));}
+		// if (GEngine) {GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Cyan, TEXT("Dropped!"));}
 		HeldObject->bIsFocused = false;
 		HeldObject = nullptr;     
 		GrabPhysicsConstraint->BreakConstraint();
+		if (HeldObjectHitResult.GetComponent())
+		{
+			HeldObjectHitResult.GetComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
+		}
 	}
 }
 
 /**
  * Move our HoldObjectComponent to the Grabbed Object and connect them with a physics constraint.
+ * 
+ * TODO: Reset CollisionResponse on Drop
  */
-void ARatCharacter::GrabObject(AInteractable* ActorToGrab, UPrimitiveComponent* ComponentToGrab, FName ComponentName)
+void ARatCharacter::GrabObject()
 {
+	HeldObject = Cast<AGrabbable>(FocusedObject);
+	
 	// Grab Object
 	FHitResult HitResult = TriggerLineTrace();
 	HoldObjectComponent->SetWorldLocationAndRotation(HitResult.ImpactPoint, HoldObjectComponent->GetComponentRotation(), false, nullptr, ETeleportType::TeleportPhysics);
 	GrabPhysicsConstraint->SetConstrainedComponents(HoldObjectComponent, "HoldObjectComponent", HitResult.GetComponent(), HitResult.BoneName);
 	HitResult.GetComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	HeldObjectHitResult = HitResult;
 
 	// Reel object in
 	FLatentActionInfo LatentInfo;

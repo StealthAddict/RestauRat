@@ -39,12 +39,13 @@ public:
 
 	// -- PROPERTIES --
 	AInteractable* FocusedObject;
-	AInteractable* HeldObject;
+	AGrabbable* HeldObject;
+	FHitResult HeldObjectHitResult;
 
 	// -- FUNCTIONS -- 
 	virtual void Landed(const FHitResult& Hit) override;
 	void DropObject();
-	void GrabObject(AInteractable* ActorToGrab, UPrimitiveComponent* ComponentToGrab, FName ComponentName);
+	void GrabObject();
 
 protected:
 	// Called when the game starts or when spawned
